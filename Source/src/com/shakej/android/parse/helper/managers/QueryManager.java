@@ -1,7 +1,9 @@
 package com.shakej.android.parse.helper.managers;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import android.content.Context;
+import android.util.Log;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -9,13 +11,11 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.shakej.android.parse.helper.listeners.ParseListener;
 
-import android.content.Context;
-import android.util.Log;
-
 public class QueryManager
 {
+  @SuppressWarnings("unused")
   private Context context;
-  private ArrayList<ParseListener> listeners = new ArrayList<ParseListener>();
+  private ParseListener listener;
   
   
   public QueryManager(Context context)
@@ -24,9 +24,14 @@ public class QueryManager
   }
   
   
+  public void clearListeners()
+  {
+  }
+  
+  
   public void addListener(ParseListener listener)
   {
-    listeners.add(listener);
+    this.listener = listener;
   }
   
   
@@ -40,17 +45,15 @@ public class QueryManager
       {
         if (e == null)
         {
-          if (searchObjects.size() > 0)
-            Log.w("Parse", "Search Parse Obejcts Count : " + searchObjects.size());
+          Log.w("Parse", "Search Parse Obejcts Count : " + searchObjects.size());
         }
         else
           Log.w("Parse", "Error: " + e.getMessage());
         
-        for (ParseListener listener : listeners)
-        {
+        if (listener != null)
           listener.onRequestEnd(searchObjects);
-        }
       }
     });
   }
+  
 }

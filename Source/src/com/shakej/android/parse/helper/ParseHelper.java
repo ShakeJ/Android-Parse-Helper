@@ -1,5 +1,7 @@
 package com.shakej.android.parse.helper;
 
+import java.util.HashMap;
+
 import android.content.Context;
 
 import com.parse.Parse;
@@ -21,26 +23,39 @@ public class ParseHelper
   private QueryManager queryManager;
   
   
-  public static ParseHelper getInstance()
+  public static ParseHelper getInstance(Context context)
   {
     if (instance == null)
     {
       synchronized (ParseHelper.class)
       {
         if (instance == null)
-          instance = new ParseHelper();
+          instance = new ParseHelper(context);
       }
     }
     return instance;
   }
   
   
-  public void parseInit(Context context, String applicationId, String clientKey)
+  private ParseHelper(Context context)
   {
     this.context = context;
-    loginManager = new LoginManager(context);
-    queryManager = new QueryManager(context);
-    
+    if (loginManager == null)
+      loginManager = new LoginManager(context);
+    if (queryManager == null)
+      queryManager = new QueryManager(context);
+  }
+  
+  
+  public void clearListener()
+  {
+    loginManager.clearListeners();
+    queryManager.clearListeners();
+  }
+  
+  
+  public void parseInit(String applicationId, String clientKey)
+  {
     Parse.initialize(context, applicationId, clientKey);
     ParseUser.enableAutomaticUser();
     ParseACL defaultACL = new ParseACL();
@@ -90,6 +105,20 @@ public class ParseHelper
   {
     loginManager.addListener(listener);
     loginManager.login(id, pw);
+  }
+  
+  
+  public void requestUserWithDeviceToken(ParseListener listener, String deviceToken)
+  {
+    loginManager.addListener(listener);
+    loginManager.getUserWithDeviceToken(deviceToken);
+  }
+  
+  
+  public void setDataToUserData(ParseListener listener, String userName, HashMap<Object, Object> datas)
+  {
+    loginManager.addListener(listener);
+    loginManager.setDataToUserData(userName, datas);
   }
   
   
